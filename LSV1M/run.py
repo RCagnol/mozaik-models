@@ -9,6 +9,7 @@ import matplotlib
 matplotlib.use('Agg')
 
 from mpi4py import MPI
+from validation import validate_spont
 from mozaik.storage.datastore import Hdf5DataStore, PickledDataStore
 from parameters import ParameterSet
 from analysis_and_visualization import perform_analysis_and_visualization
@@ -60,3 +61,4 @@ else:
 if mpi_comm.rank == 0:
     print("Starting visualization")
     perform_analysis_and_visualization(data_store)
+    validate_spont(data_store)

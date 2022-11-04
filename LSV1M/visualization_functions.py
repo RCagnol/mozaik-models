@@ -1802,3 +1802,53 @@ class TrialToTrialVariabilityComparisonNew(Plotting):
         
         if self.plot_file_name:
                         pylab.savefig(Global.root_directory+self.plot_file_name)
+
+class ValidationFigTable(Plotting):
+
+    required_parameters = ParameterSet({
+    })
+
+    def __init__(self, datastore, parameters, plot_file_name=None, fig_param=None, frame_duration=0):
+        Plotting.__init__(self, datastore, parameters, plot_file_name, fig_param, frame_duration)
+
+
+    def plot(self):
+        results = param_filter_query(self.datastore, sheet_name="V1_Exc_L4", identifier='ValidationTestResult').get_analysis_result()
+        self.number_of_rows = len(results)
+        self.fig = pylab.figure(facecolor='none', figsize = (6, self.number_of_rows/2), **self.fig_param)
+
+        ax = self.fig.add_subplot(111)
+        ax.spines['right'].set_visible(False)
+        ax.spines['left'].set_visible(False)
+        ax.spines['bottom'].set_visible(False)
+        ax.spines['top'].set_visible(False)
+
+        rows_text = []
+        rows_colors = []
+
+        for result in results:
+            rows_text.append([result.test_name, result.sheet_name, result.observation_value, f'{result.test_score:.2f}', 'PASS' if result.result == True else 'FAIL'])
+            rows_colors.append(['whitesmoke', 'whitesmoke', 'whitesmoke', 'whitesmoke', 'limegreen' if result.result == True else 'orangered'])
+
+        result_table = ax.table(cellText = rows_text,
+                    cellColours = rows_colors,
+                    fontsize = 28,
+                    loc='center',
+                    cellLoc='center',
+                    colWidths=[.4, .15, .15, .15, .15],
+                    )
+
+        cell_dict = result_table.get_celld()
+        for i in range(0, self.number_of_rows):
+            cell_dict[(i, 0)].set_height(1/(self.number_of_rows))
+            cell_dict[(i, 1)].set_height(1/(self.number_of_rows))
+            cell_dict[(i, 2)].set_height(1/(self.number_of_rows))
+            cell_dict[(i, 3)].set_height(1/(self.number_of_rows))
+            cell_dict[(i, 4)].set_height(1/(self.number_of_rows))
+
+        remove_x_tick_labels()
+        remove_y_tick_labels()
+
+        if self.plot_file_name:
+            pylab.savefig(Global.root_directory+self.plot_file_name)
+
